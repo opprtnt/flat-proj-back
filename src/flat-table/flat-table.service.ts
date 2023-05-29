@@ -6,7 +6,7 @@ import { GetFlatTableDto } from './dto/get-flat-table.dto';
 export class FlatTableService {
   constructor(private prisma: PrismaService) {}
 
-  findAll({
+  async findAll({
     page,
     size,
     maxAreaKitchen,
@@ -21,39 +21,47 @@ export class FlatTableService {
     minFloor,
     minPrice,
     minRoom,
-    sort,
+    sortColumn,
+    sortDir,
   }: GetFlatTableDto) {
     const skip = (+page - 1) * +size;
     const formatNumber = (value: string | undefined) =>
       value !== undefined ? +value : undefined;
-
-    return this.prisma.flat.findMany({
-      skip: skip,
-      take: +size,
-      orderBy: sort
-        ? [
-            {
-              price: sort,
-            },
-          ]
-        : undefined,
-      where: {
-        rooms: { gte: formatNumber(minRoom), lte: formatNumber(maxRoom) },
-        floor: { gte: formatNumber(minFloor), lte: formatNumber(maxFloor) },
-        price: { gte: formatNumber(minPrice), lte: formatNumber(maxPrice) },
-        area_total: {
-          gte: formatNumber(minAreaTotal),
-          lte: formatNumber(maxAreaTotal),
-        },
-        area_kitchen: {
-          gte: formatNumber(minAreaKitchen),
-          lte: formatNumber(maxAreaKitchen),
-        },
-        area_live: {
-          gte: formatNumber(minAreaLive),
-          lte: formatNumber(maxAreaLive),
-        },
+    const query = {
+      rooms: { gte: formatNumber(minRoom), lte: formatNumber(maxRoom) },
+      floor: { gte: formatNumber(minFloor), lte: formatNumber(maxFloor) },
+      price: { gte: formatNumber(minPrice), lte: formatNumber(maxPrice) },
+      area_total: {
+        gte: formatNumber(minAreaTotal),
+        lte: formatNumber(maxAreaTotal),
       },
-    });
+      area_kitchen: {
+        gte: formatNumber(minAreaKitchen),
+        lte: formatNumber(maxAreaKitchen),
+      },
+      area_live: {
+        gte: formatNumber(minAreaLive),
+        lte: formatNumber(maxAreaLive),
+      },
+    };
+    const orderBy =
+      sortColumn && sortDir ? [{ [sortColumn]: sortDir }] : undefined;
+
+    const [count, data] = await this.prisma.$transaction([
+      this.prisma.flat.count({ where: query }),
+      this.prisma.flat.findMany({
+        skip: skip,
+        take: +size,
+        orderBy: orderBy,
+        where: query,
+      }),
+    ]);
+
+    return {
+      data: data,
+      pagination: {
+        total: count,
+      },
+    };
   }
 }

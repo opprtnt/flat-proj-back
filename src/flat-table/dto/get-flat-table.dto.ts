@@ -13,5 +13,6 @@ export class GetFlatTableDto {
   maxAreaKitchen?: string;
   minAreaLive?: string;
   maxAreaLive?: string;
-  sort?: 'desc' | 'asc';
+  sortDir?: 'desc' | 'asc';
+  sortColumn?: string;
 }
