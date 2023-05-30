@@ -52,3 +52,9 @@ Nest is [MIT licensed](LICENSE).
 ## Подключение к БД
 
 Настройки находятся в prisma/schema.prisma
+
+## Миграции
+
+```bash
+$ npx prisma migrate dev --name init
+```
