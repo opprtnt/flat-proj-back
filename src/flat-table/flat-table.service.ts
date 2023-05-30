@@ -23,13 +23,17 @@ export class FlatTableService {
     minRoom,
     sortColumn,
     sortDir,
+    floor,
   }: GetFlatTableDto) {
-    const skip = (+page - 1) * +size;
+    const skip = size ? (+page - 1) * +size : undefined;
     const formatNumber = (value: string | undefined) =>
       value !== undefined ? +value : undefined;
     const query = {
       rooms: { gte: formatNumber(minRoom), lte: formatNumber(maxRoom) },
-      floor: { gte: formatNumber(minFloor), lte: formatNumber(maxFloor) },
+      floor:
+        floor !== undefined
+          ? +floor
+          : { gte: formatNumber(minFloor), lte: formatNumber(maxFloor) },
       price: { gte: formatNumber(minPrice), lte: formatNumber(maxPrice) },
       area_total: {
         gte: formatNumber(minAreaTotal),
@@ -51,7 +55,7 @@ export class FlatTableService {
       this.prisma.flat.count({ where: query }),
       this.prisma.flat.findMany({
         skip: skip,
-        take: +size,
+        take: size ? +size : undefined,
         orderBy: orderBy,
         where: query,
       }),

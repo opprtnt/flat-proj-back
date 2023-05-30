@@ -1,6 +1,6 @@
 export class GetFlatTableDto {
-  page: string;
-  size: string;
+  page?: string;
+  size?: string;
   minRoom?: string;
   maxRoom?: string;
   minFloor?: string;
@@ -15,4 +15,5 @@ export class GetFlatTableDto {
   maxAreaLive?: string;
   sortDir?: 'desc' | 'asc';
   sortColumn?: string;
+  floor?: string;
 }
