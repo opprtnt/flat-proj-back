@@ -11,8 +11,4 @@ export class FlatTableController {
     return this.flatTableService.findAll(query);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.flatTableService.findOne(+id);
-  // }
 }
